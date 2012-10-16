@@ -16,6 +16,14 @@
             div.box-container {
                 display:inline-block;
             }
+            div.drawer-container {
+                float:left;
+                position:absolute;
+                top:135px;
+                width:100%;
+                padding:25px 10px 25px 10px;
+                background-color:gray;
+            }
         </style>
 
         <!-- TEMPLATES -->
@@ -60,15 +68,19 @@
 
             initialize: function() {
                 this.model.bind('add', this.addBox, this);
+                this.toggle();
             },
 
             addBox: function(box) {
                 console.log('addBox');
-                console.log(box);
                 $(this.el).append(new BoxView({model:box}).render().el);
             },
             render: function(ev) {
                 console.log('drawer render');
+            },
+
+            toggle: function() {
+                $(this.el).toggle();
             }
         });
 
@@ -99,6 +111,7 @@
                         console.log('counting');
                         this.boxList.add(box)
                     }, this);
+                    
 
                 }
 
@@ -106,15 +119,16 @@
 
             render: function() {
                 $(this.el).html(this.template(this.model.toJSON()));
+                if (this.drawer) {
+                    $(this.el).append($(this.drawer.el));
+                }
                 return this;
             },
 
             handleClick: function() {
                 // Has additional components
                 if (this.drawer) {
-                    console.log($(this.drawer.el));
-                    $(this.el).append($(this.drawer.el));
-                    console.log('we have a drawer');
+                    this.drawer.toggle()
                 }
             }
         });
