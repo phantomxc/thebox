@@ -59,14 +59,16 @@
             className: 'drawer-container',
 
             initialize: function() {
-                this.model.bind('add', this.render, this);
+                this.model.bind('add', this.addBox, this);
             },
 
+            addBox: function(box) {
+                console.log('addBox');
+                console.log(box);
+                $(this.el).append(new BoxView({model:box}).render().el);
+            },
             render: function(ev) {
                 console.log('drawer render');
-                _.each(this.model.models, function(box) {
-                    $(this.el).append(new BoxView({model:box}).render().el);
-                }, this);
             }
         });
 
@@ -94,10 +96,9 @@
                         model:this.boxList
                     });
                     _.each(this.model.attributes.components, function(box) {
+                        console.log('counting');
                         this.boxList.add(box)
                     }, this);
-
-                    console.log(this.boxList);
 
                 }
 
@@ -111,6 +112,8 @@
             handleClick: function() {
                 // Has additional components
                 if (this.drawer) {
+                    console.log($(this.drawer.el));
+                    $(this.el).append($(this.drawer.el));
                     console.log('we have a drawer');
                 }
             }
