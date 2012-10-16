@@ -1,0 +1,168 @@
+<html>
+    <head>
+        <script src="js/lib/jquery-1.8.2.min.js"></script>
+        <script src="js/lib/underscore-min.js"></script>
+        <script src="js/lib/backbone-min.js"></script>
+        <style>
+            div.box-view {
+                width:100px;
+                height:100px;
+                background-color:blue;
+                color:white;
+                padding:5px;
+                margin:5px;
+            }
+
+            div.box-container {
+                display:inline-block;
+            }
+        </style>
+
+        <!-- TEMPLATES -->
+        <script type="text/html" id="tpl-box-view">
+            <div class="box-view">
+                <h2 class="name"><%= name %></h2>
+                <%= alerts %>
+            </div>
+        </script>
+        <!-- END TEMPLATES -->
+
+        <script>
+
+        // Models
+        var Box = Backbone.Model.extend();
+
+        //-------------------------
+        // DashboardView
+        //-------------------------
+        var DashboardView = Backbone.View.extend({
+            el:'#container',
+
+            initialize: function() {
+                //model is passed in as an argument and is a BoxCollection instance
+                this.model.bind('reset', this.render, this);
+            },
+
+            render: function(ev) {
+                _.each(this.model.models, function(box) {
+                    $(this.el).append(new BoxView({model:box}).render().el);
+                }, this);
+                return this;
+            }
+        });
+
+        //-------------------------
+        // DrawerView
+        //-------------------------
+        var DrawerView = Backbone.View.extend({
+
+            className: 'drawer-container',
+
+            initialize: function() {
+                this.model.bind('add', this.render, this);
+            },
+
+            render: function(ev) {
+                console.log('drawer render');
+                _.each(this.model.models, function(box) {
+                    $(this.el).append(new BoxView({model:box}).render().el);
+                }, this);
+            }
+        });
+
+        //-------------------------------
+        // BOX VIEW 
+        //--------------------------------
+        var BoxView = Backbone.View.extend({
+
+            tagName: 'div',
+
+            className: 'box-container',
+            
+            template:_.template($('#tpl-box-view').html()),
+
+            events: {
+                'click .box-view' : "handleClick"
+            },
+
+            initialize: function() {
+                if (this.model.attributes.components) {
+
+                    // A collection of box models to put in the drawers
+                    this.boxList = new BoxCollection();
+                    this.drawer = new DrawerView({
+                        model:this.boxList
+                    });
+                    _.each(this.model.attributes.components, function(box) {
+                        this.boxList.add(box)
+                    }, this);
+
+                    console.log(this.boxList);
+
+                }
+
+            },
+
+            render: function() {
+                $(this.el).html(this.template(this.model.toJSON()));
+                return this;
+            },
+
+            handleClick: function() {
+                // Has additional components
+                if (this.drawer) {
+                    console.log('we have a drawer');
+                }
+            }
+        });
+
+        //--------------------------------
+        // Box Collection
+        //--------------------------------
+        var BoxCollection = Backbone.Collection.extend({
+            model:Box,
+            initialize:function() {
+                this.url = 'boxes';
+            }
+        });
+       
+        //----------------------------------
+        // Router
+        //------------------------------------
+        var AppRouter = Backbone.Router.extend({
+            
+            routes: {
+                "":"build",
+                "/":"build"
+            },
+
+            build:function() {
+                console.log('building');
+                this.boxList = new BoxCollection();
+                this.dashboard = new DashboardView({
+                    model:this.boxList
+                });
+                this.boxList.fetch();
+
+            }
+        });
+
+        //---------------------
+        // Start the app
+        //---------------------
+        $(function() {
+            var app = new AppRouter();
+            Backbone.history.start();
+
+        });
+
+
+        </script>
+    </head>
+    <body>
+        <div id="container">
+        </div>
+
+
+    </body>
+</html>
