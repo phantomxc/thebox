@@ -53,24 +53,37 @@ class Boxes(Resource):
         print 'BOXES'
         return json.dumps([
             {
-                'name':'Box1',
+                'name':'PCI Compliance',
                 'alerts':'4',
                 'components':[{
-                    'name':'Component1',
+                    'name':'Questionnaire',
                     'alerts':'1'
                 },
                 {
-                    'name':'Component2',
+                    'name':'Scans',
                     'alerts':'2'
                 },
                 {
-                    'name':'Component3',
+                    'name':'PANscan',
                     'alerts':'1'
                 }]
             },
             {
-                'name':'Box2',
-                'alerts':'2'
+                'name':'Assurance',
+                'alerts':'2',
+                'components':[{
+                    'name':'PANscan',
+                    'alerts':''
+                },
+                {
+                    'name':'Certificate',
+                    'alerts':''
+                },
+                {
+                    'name':'Claim',
+                    'alerts':''
+                },
+                ]
             }
                 
         ])
@@ -81,10 +94,11 @@ root = Resource()
 root.putChild('', MainResource())
 
 js_resource = File('./static/js')
-
+img_resource = File('./static/img')
 
 #STATIC STUFF
 root.putChild('js', js_resource)
+root.putChild('img', img_resource)
 
 #stuff
 root.putChild("boxes", Boxes())

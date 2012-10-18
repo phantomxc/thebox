@@ -4,33 +4,87 @@
         <script src="js/lib/underscore-min.js"></script>
         <script src="js/lib/backbone-min.js"></script>
         <style>
+            * {
+                margin:0px;
+                padding:0px;
+            }
+            body {
+                background-image:url("img/bgpattern.jpg");
+            }
             div.box-view {
-                width:100px;
-                height:100px;
-                background-color:blue;
-                color:white;
-                padding:5px;
-                margin:5px;
+                -moz-border-radius: 13px;
+                -webkit-border-radius: 13px;
+                border-radius: 13px;
+                /*IE 7 AND 8 DO NOT SUPPORT BORDER RADIUS*/
+                -moz-box-shadow: 1px 2px 8px 1px #6f7378;
+                -webkit-box-shadow: 1px 2px 8px 1px #6f7378;
+                box-shadow: 1px 2px 8px 1px #6f7378;
+                filter: progid:DXImageTransform.Microsoft.Shadow(strength = 2, direction = 157.5, color = '#6f7378');
+                -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(strength = 2, Direction = 157.5, Color = '#6f7378')";
+                /*Shadows look very different in IE (Only cardinal directions supported)*/
+                /*INNER ELEMENTS MUST NOT BREAK THIS ELEMENTS BOUNDARIES*/
+                /*Element should have a background-color*/
+                /*All filters must be placed together*/
+                /*IE 7 AND 8 DO NOT SUPPORT BLUR PROPERTY OF SHADOWS*/
+                /*IE 7 AND 8 DO NOT SUPPORT SPREAD PROPERTY OF SHADOWS*/
+                background-color:white;
+
+                width:250px;
+                height:250px;
+                padding:15px;
+                margin:25px;
+            }
+
+            div.drawer-container div.box-view {
+                width:150px;
+                height:150px;
             }
 
             div.box-container {
                 display:inline-block;
             }
             div.drawer-container {
-                float:left;
+                background-image:url("img/navy_blue.png");
                 position:absolute;
-                top:135px;
+                top:328px;
+                left:0px;
                 width:100%;
                 padding:25px 10px 25px 10px;
-                background-color:gray;
+                -moz-box-shadow: inset 0px 9px 24px 5px #090a0a;
+                -webkit-box-shadow: inset 0px 9px 24px 5px #090a0a;
+                box-shadow: inset 0px 9px 24px 5px #090a0a;
+                /*Inner elements should not cover inner shadows*/
+                /*IE 7 AND 8 DO NOT SUPPORT INSET SHADOWS*/
+
+
+            }
+
+            span.alerts {
+                background-color: #B94A48;
+                padding: 1px 9px 2px;
+                -webkit-border-radius: 9px;
+                -moz-border-radius: 9px;
+                border-radius: 9px;
+                font-size: 14.844px;
+                font-weight: bold;
+                line-height: 14px;
+                color: white;
+                text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+                white-space: nowrap;
+                vertical-align: baseline;
+                float:right;
             }
         </style>
 
         <!-- TEMPLATES -->
         <script type="text/html" id="tpl-box-view">
             <div class="box-view">
-                <h2 class="name"><%= name %></h2>
-                <%= alerts %>
+                <h2 class="name">
+                    <%= name %>
+                    <span class="alerts"><%= alerts %></span>
+                </h2>
+            </div>
+            <div class="drawer-container" style="display:none;">
             </div>
         </script>
         <!-- END TEMPLATES -->
@@ -64,24 +118,18 @@
         //-------------------------
         var DrawerView = Backbone.View.extend({
 
-            className: 'drawer-container',
-
             initialize: function() {
-                this.model.bind('add', this.addBox, this);
-                this.toggle();
+                this.model.bind('add', this.render, this);
             },
 
-            addBox: function(box) {
-                console.log('addBox');
-                $(this.el).append(new BoxView({model:box}).render().el);
-            },
-            render: function(ev) {
-                console.log('drawer render');
-            },
-
-            toggle: function() {
-                $(this.el).toggle();
+            render: function() {
+                $(this.el).html('');
+                _.each(this.model.models, function(box) {
+                    $(this.el).append(new BoxView({model:box}).render().el);
+                }, this)
+                return this
             }
+
         });
 
         //-------------------------------
@@ -101,17 +149,12 @@
 
             initialize: function() {
                 if (this.model.attributes.components) {
-
                     // A collection of box models to put in the drawers
                     this.boxList = new BoxCollection();
-                    this.drawer = new DrawerView({
-                        model:this.boxList
-                    });
+
                     _.each(this.model.attributes.components, function(box) {
-                        console.log('counting');
                         this.boxList.add(box)
                     }, this);
-                    
 
                 }
 
@@ -119,17 +162,21 @@
 
             render: function() {
                 $(this.el).html(this.template(this.model.toJSON()));
-                if (this.drawer) {
-                    $(this.el).append($(this.drawer.el));
+                
+                if (this.boxList) {
+                    this.drawer = this.$('.drawer-container').append(new DrawerView({model:this.boxList}).render().el);
                 }
+
                 return this;
             },
 
             handleClick: function() {
                 // Has additional components
+                console.log(this.model.get('name'));
                 if (this.drawer) {
-                    this.drawer.toggle()
+                    $(this.drawer).slideToggle();
                 }
+                return false;
             }
         });
 
@@ -154,7 +201,6 @@
             },
 
             build:function() {
-                console.log('building');
                 this.boxList = new BoxCollection();
                 this.dashboard = new DashboardView({
                     model:this.boxList
