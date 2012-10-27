@@ -44,7 +44,7 @@ class MainResource(Resource):
     Handles the root directory
     """
     def render_GET(self, request):
-        return jrender(request, 'index.html')
+        return jrender(request, 'index2.html')
 
 
 class Boxes(Resource):
@@ -94,14 +94,16 @@ root = Resource()
 root.putChild('', MainResource())
 
 js_resource = File('./static/js')
+css_resource = File('./static/css')
 img_resource = File('./static/img')
 
 #STATIC STUFF
 root.putChild('js', js_resource)
+root.putChild('css', css_resource)
 root.putChild('img', img_resource)
 
 #stuff
-root.putChild("boxes", Boxes())
+root.putChild("myapps", Boxes())
 
 factory = Site(root)
 reactor.listenTCP(8989, factory)
