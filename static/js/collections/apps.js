@@ -1,8 +1,15 @@
-Milky.Collections.AppCollection = Backbone.Collection.extend({
-        
-    model: Milky.Models.App,
+define([
+    'backbone',
+    'underscore',
+    'models/app'
+], function(Backbone, _, AppModel) {
 
-    initialize:function() {
-        this.url = 'myapps';
-    }
+     return Backbone.Collection.extend({
+            
+        model: AppModel,
+
+        initialize:function() {
+            this.url = 'myapps';
+        }
+    });
 });

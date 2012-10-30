@@ -1,47 +1,53 @@
-console.log('wtf');
-Milky.Views.AppView = Backbone.View.extend({
+define([
+    'backbone',
+    'underscore',
+    'views/drawer',
+    'collections/apps'
+], function(Backbone, _, DrawerView, AppCollection) {
 
-    tagName: 'div',
+    // AppView
+    return Backbone.View.extend({
 
-    className: 'app-container',
-    
-    template:_.template($('#tpl-app-view').html()),
+        tagName: 'div',
 
-    events: {
-        'click .app-view' : "handleClick"
-    },
-
-    initialize: function() {
-        console.log('appview init');
-        if (this.model.attributes.components) {
-            // A collection of box models to put in the drawers
-            this.appList = new Milky.Collections.AppCollection();
-
-            _.each(this.model.attributes.components, function(app) {
-                this.appList.add(app)
-            }, this);
-
-        }
-
-    },
-
-    render: function() {
-        console.log('render');
-        $(this.el).html(this.template(this.model.toJSON()));
+        className: 'app-container',
         
-        if (this.appList) {
-            this.drawer = this.$('.drawer-container').append(new Milky.Views.DrawerView({model:this.appList}).render().el);
-        }
+        template:_.template($('#tpl-app-view').html()),
 
-        return this;
-    },
+        events: {
+            'click .app-view' : "handleClick"
+        },
 
-    handleClick: function() {
-        // Has additional components
-        if (this.drawer) {
-            $(this.drawer).slideToggle();
+        initialize: function() {
+            if (this.model.attributes.components) {
+                // A collection of app models to put in the drawers
+                this.appList = new AppCollection();
+
+                _.each(this.model.attributes.components, function(app) {
+                    this.appList.add(app)
+                }, this);
+
+            }
+
+        },
+
+        render: function() {
+            $(this.el).html(this.template(this.model.toJSON()));
+            
+            if (this.appList) {
+                this.drawer = this.$('.drawer-container').append(new DrawerView({model:this.appList}).render().el);
+            }
+
+            return this;
+        },
+
+        handleClick: function() {
+            // Has additional components
+            if (this.drawer) {
+                $(this.drawer).slideToggle();
+            }
+            return false;
         }
-        return false;
-    }
+    });
 });
 

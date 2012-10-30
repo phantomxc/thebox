@@ -1,1 +1,8 @@
-Milky.Models.App = Backbone.Model.extend();
+define([
+    'backbone',
+    'underscore',
+], function(Backbone, _, AppView) {
+    
+    return Backbone.Model.extend();
+
+});

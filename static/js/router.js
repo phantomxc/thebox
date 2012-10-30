@@ -1,9 +1,14 @@
-Milky.Router = Backbone.Router.extend({
-    routes: {
-        '':'index'
-    },
+define([
+    'backbone',
+    'underscore'
+], function(Backbone, _) {
+    return Backbone.Router.extend({
+        routes: {
+            '':'index'
+        },
 
-    index: function() {
-        console.log('index route');        
-    }
+        index: function() {
+            console.log('index route');        
+        }
+    });
 });

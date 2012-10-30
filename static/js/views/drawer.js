@@ -1,16 +1,26 @@
-Milky.Views.DrawerView = Backbone.View.extend({
+define([
+    'require',
+    'backbone',
+    'underscore',
+    'views/app'
+], function(require, Backbone, _, AppView) {
 
-    initialize: function() {
-        this.model.bind('add', this.render, this);
-    },
+    return Backbone.View.extend({
 
-    render: function() {
-        $(this.el).html('');
-        _.each(this.model.models, function(app) {
-            $(this.el).append(new Milky.Views.AppView({model:app}).render().el);
-        }, this)
-        return this
-    }
+        initialize: function() {
+            this.model.bind('add', this.render, this);
+        },
 
+        render: function() {
+            $(this.el).html('');
+            _.each(this.model.models, function(app) {
+                // THIS IS REQUIRED BECAUSE IT'S A CIRCULAR DEPENDENCY
+                var AppView = require("views/app");
+                $(this.el).append(new AppView({model:app}).render().el);
+            }, this)
+            return this
+        }
+
+    });
 });
 

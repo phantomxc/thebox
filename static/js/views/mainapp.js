@@ -1,16 +1,24 @@
-Milky.Views.MainApp = Backbone.View.extend({
+define([
+    'backbone',
+    'underscore',
+    'collections/apps',
+    'views/dashboard',
+    'router'
+], function(Backbone, _, AppCollection, DashboardView, Router) {
 
-    initialize: function() {
+    return Backbone.View.extend({
 
-        this.appList = new Milky.Collections.AppCollection();
-        this.dashboard = new Milky.Views.DashboardView({
-            'collection':this.appList
-        });
+        initialize: function() {
 
-        this.appList.fetch();
+            this.appList = new AppCollection();
+            this.dashboard = new DashboardView({
+                'collection':this.appList
+            });
 
-        var router = this.router = new Milky.Router;
+            this.appList.fetch();
 
-    }
+            var router = this.router = new Router;
 
+        }
+    });
 });
